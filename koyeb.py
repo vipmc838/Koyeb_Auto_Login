@@ -3,6 +3,7 @@ import json
 import time
 import logging
 import requests
+from datetime import datetime, timedelta
 
 # 配置日志格式
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -51,7 +52,7 @@ def login_koyeb(email, password):
     try:
         response = requests.post(login_url, headers=headers, json=data, timeout=30)
         response.raise_for_status()
-        return True, "登录成功"
+        return True, "成功"
     except requests.Timeout:
         return False, "请求超时"
     except requests.RequestException as e:
@@ -64,12 +65,11 @@ def main():
         if not koyeb_accounts:
             raise ValueError("❌ 没有找到有效的 Koyeb 账户信息")
 
-        results = []
-        current_time = time.strftime("%Y-%m-%d %H:%M:%S")
-        total_accounts = len(koyeb_accounts)
-        success_count = 0
+        # 获取北京时间（UTC+8）
+        current_time = (datetime.utcnow() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M")
+        messages = []
 
-        for index, account in enumerate(koyeb_accounts, 1):
+        for account in koyeb_accounts:
             email = account.get("email", "").strip()
             password = account.get("password", "")
 
@@ -77,23 +77,18 @@ def main():
                 logging.warning(f"⚠️ 账户信息不完整，跳过: {email}")
                 continue
 
-            logging.info(f"🔄 正在处理 {index}/{total_accounts} 账户: {email}")
+            logging.info(f"🔄 正在处理账户: {email}")
             success, message = login_koyeb(email, password)
 
-            if success:
-                status_line = f"✅ {message}"
-                success_count += 1
-            else:
-                status_line = f"❌ 登录失败\n原因：{message}"
+            result = "🎉 签到结果: 成功" if success else f"❌ 签到失败 | 原因: {message}"
+            messages.append(f"📧 账户: {email}\n\n{result}")
 
-            results.append(f"📌 账户: {email}\n{status_line}\n")
-            time.sleep(5)  # 控制请求频率，避免风控
+            time.sleep(5)
 
-        summary = f"📊 总计: {total_accounts} 个账户\n✅ 成功: {success_count} | ❌ 失败: {total_accounts - success_count}\n\n"
-        tg_message = f"🤖 *Koyeb 登录状态报告*\n⏰ *检查时间:* {current_time}\n\n{summary}" + "\n".join(results)
+        summary = f"🗓️ 北京时间: {current_time}\n\n" + "\n\n".join(messages) + "\n\n✅ 任务执行完成"
 
         logging.info("📋 任务完成，发送 Telegram 通知")
-        send_tg_message(tg_message)
+        send_tg_message(summary)
 
     except Exception as e:
         error_message = f"❌ 执行出错: {e}"
