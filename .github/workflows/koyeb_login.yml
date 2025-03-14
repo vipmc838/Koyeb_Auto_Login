@@ -28,4 +28,4 @@ jobs:
         KOYEB_ACCOUNTS: ${{ secrets.KOYEB_ACCOUNTS }}
         TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
         TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-      run: koyeb.py
+      run: python koyeb.py
