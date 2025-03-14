@@ -1,0 +1,31 @@
+name: Koyeb Auto Login
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # 每周日执行一次
+  workflow_dispatch:
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    - name: 🚀 Run Koyeb login script
+      env:
+        KOYEB_ACCOUNTS: ${{ secrets.KOYEB_ACCOUNTS }}
+        TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+        TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+      run: python koyeb/koyeb.py
