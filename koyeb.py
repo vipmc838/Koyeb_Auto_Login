@@ -80,7 +80,7 @@ def main():
             logging.info(f"🔄 正在处理账户: {email}")
             success, message = login_koyeb(email, password)
 
-            result = "🎉 签到结果: 成功" if success else f"❌ 签到失败 | 原因: {message}"
+            result = "🎉 登录结果: 成功" if success else f"❌ 登录失败 | 原因: {message}"
             messages.append(f"📧 账户: {email}\n\n{result}")
 
             time.sleep(5)
