@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-Koyeb Auto Login 是一个自动化脚本，旨在定期登录 Koyeb 账户，以保持账户的活跃状态。该项目支持两种部署方式：GitHub Actions（推荐）和 Cloudflare Workers。
+Koyeb Auto Login 是一个自动化脚本，旨在定期登录 Koyeb 账户，以保持账户的活跃状态。该项目部署方式：青龙面板。
 
 ## 部署方式
 
