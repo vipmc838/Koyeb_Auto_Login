@@ -37,6 +37,28 @@ def send_tg_message(message):
     except requests.RequestException as e:
         logging.error(f"❌ 发送 Telegram 消息失败: {e}")
 
+def send_pushplus_message(message):
+    """发送 PushPlus 消息"""
+    token = os.getenv("PUSHPLUS_TOKEN")
+    if not token:
+        logging.warning("⚠️ PUSHPLUS_TOKEN 未设置，跳过 PushPlus 通知")
+        return
+
+    url = "https://www.pushplus.plus/send"
+    data = {
+        "token": token,
+        "title": "Koyeb 登录通知",
+        "content": message.replace("\n", "<br>"),
+        "template": "html"
+    }
+
+    try:
+        response = requests.post(url, json=data, timeout=30)
+        response.raise_for_status()
+        logging.info("✅ PushPlus 消息发送成功")
+    except requests.RequestException as e:
+        logging.error(f"❌ 发送 PushPlus 消息失败: {e}")
+
 def login_koyeb(email, password):
     """执行 Koyeb 账户登录"""
     if not email or not password:
@@ -51,8 +73,10 @@ def login_koyeb(email, password):
 
     try:
         response = requests.post(login_url, headers=headers, json=data, timeout=30)
-        response.raise_for_status()
-        return True, "成功"
+        if response.status_code == 200:
+            return True, "成功"
+        else:
+            return False, f"状态码: {response.status_code} | 响应: {response.text}"
     except requests.Timeout:
         return False, "请求超时"
     except requests.RequestException as e:
@@ -65,7 +89,6 @@ def main():
         if not koyeb_accounts:
             raise ValueError("❌ 没有找到有效的 Koyeb 账户信息")
 
-        # 获取北京时间（UTC+8）
         current_time = (datetime.utcnow() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M")
         messages = []
 
@@ -87,13 +110,15 @@ def main():
 
         summary = f"🗓️ 北京时间: {current_time}\n\n" + "\n\n".join(messages) + "\n\n✅ 任务执行完成"
 
-        logging.info("📋 任务完成，发送 Telegram 通知")
+        logging.info("📋 任务完成，发送通知")
         send_tg_message(summary)
+        send_pushplus_message(summary)
 
     except Exception as e:
         error_message = f"❌ 执行出错: {e}"
         logging.error(error_message)
         send_tg_message(error_message)
+        send_pushplus_message(error_message)
 
 if __name__ == "__main__":
     main()
