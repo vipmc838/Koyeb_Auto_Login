@@ -60,6 +60,13 @@ GitHub Actions 会在每周日 `00:00 UTC` 运行一次，你可以修改 `.gith
 3. 在 Cloudflare KV 中存储 `KOYEB_ACCOUNTS`。
 4. 绑定环境变量（`TG_BOT_TOKEN`、`TG_CHAT_ID`）。
 5. 设置定时触发器，使 Worker 按计划执行。
+6. 
+#### **北京时间上午 8 点执行**
+Cron 表达式：
+```
+0 0 1,15 * *
+```
+效果：每月 1 日和 15 日的北京时间 08:00 执行
 
 ## 免责声明
 
