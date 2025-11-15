@@ -24,7 +24,7 @@ GitHub Actions 可以定期执行任务，确保 Koyeb 账户保持活跃。
 
    **`KOYEB_ACCOUNTS` 格式如下：**
    
-   ```json
+```json
 [
   {
     "email": "account1@example.com",
@@ -35,7 +35,7 @@ GitHub Actions 可以定期执行任务，确保 Koyeb 账户保持活跃。
     "password": "password456"
   }
 ]
-   ```
+```
 
 3. **启用 Actions**
 
